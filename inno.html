@@ -4,33 +4,28 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Smart Pitch Cleaner - PRC</title>
-    <link
-      href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;600&display=swap"
-      rel="stylesheet"
-    />
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;600&display=swap" rel="stylesheet" />
 
     <style>
-      /* --- CSS STYLES --- */
       :root {
         --prc-blue: #003399;
-        --prc-light-blue: #eef2f7;
-        --clean-green: #2ed573;
-        --dirty-red: #ff4757;
+        --prc-gold: #ffcc00; /* สีทองตัดกับน้ำเงิน */
+        --prc-light-blue: #f0f4f8;
+        --clean-green: #2ecc71;
+        --dirty-red: #e74c3c;
       }
 
       body {
         font-family: "Prompt", sans-serif;
         margin: 0;
         background-color: var(--prc-light-blue);
-        color: #333;
-        overflow-x: hidden;
+        color: #2c3e50;
       }
 
       /* Loading Screen */
       #loader {
         position: fixed;
-        width: 100%;
-        height: 100%;
+        inset: 0;
         background: var(--prc-blue);
         display: flex;
         flex-direction: column;
@@ -38,193 +33,178 @@
         align-items: center;
         color: white;
         z-index: 9999;
-        transition: opacity 0.8s ease;
+        transition: opacity 0.6s ease;
       }
 
       .spinner {
-        width: 60px;
-        height: 60px;
-        border: 6px solid rgba(255, 255, 255, 0.2);
-        border-top: 6px solid white;
+        width: 50px;
+        height: 50px;
+        border: 5px solid rgba(255, 255, 255, 0.2);
+        border-top-color: var(--prc-gold);
         border-radius: 50%;
         animation: spin 1s linear infinite;
         margin-bottom: 20px;
       }
 
-      @keyframes spin {
-        0% {
-          transform: rotate(0deg);
-        }
-        100% {
-          transform: rotate(360deg);
-        }
-      }
+      @keyframes spin { to { transform: rotate(360deg); } }
 
-      /* Header & Logo */
+      /* Header */
       .header {
-        background: var(--prc-blue);
+        background: linear-gradient(135deg, var(--prc-blue) 0%, #001f5c 100%);
         color: white;
-        padding: 30px 20px;
+        padding: 40px 20px;
         text-align: center;
-        border-bottom-left-radius: 30px;
-        border-bottom-right-radius: 30px;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        border-bottom-left-radius: 40px;
+        border-bottom-right-radius: 40px;
+        box-shadow: 0 10px 25px rgba(0, 51, 153, 0.2);
       }
 
       .logo {
-        width: 100px;
-        filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.3));
-        margin-bottom: 10px;
+        width: 120px; /* ปรับขนาดโลโก้ */
+        height: auto;
+        margin-bottom: 15px;
+        filter: drop-shadow(0 4px 8px rgba(0,0,0,0.2));
       }
 
-      /* Main Content */
       .container {
-        max-width: 600px;
-        margin: -20px auto 40px;
-        padding: 0 15px;
-        animation: fadeInUp 1s ease-out forwards;
-      }
-
-      @keyframes fadeInUp {
-        from {
-          opacity: 0;
-          transform: translateY(40px);
-        }
-        to {
-          opacity: 1;
-          transform: translateY(0);
-        }
+        max-width: 500px;
+        margin: -30px auto 50px;
+        padding: 0 20px;
       }
 
       .card {
         background: white;
-        border-radius: 20px;
-        padding: 20px;
+        border-radius: 24px;
+        padding: 25px;
         margin-bottom: 20px;
-        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05);
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.05);
+        border: 1px solid rgba(0, 0, 0, 0.03);
       }
 
       /* Progress Bar */
       .progress-container {
         background: #eee;
-        border-radius: 15px;
-        height: 30px;
-        width: 100%;
-        margin: 15px 0;
+        border-radius: 50px;
+        height: 25px;
+        margin: 20px 0 10px;
         overflow: hidden;
-        position: relative;
       }
 
       .progress-bar {
         height: 100%;
-        background: linear-gradient(90deg, #ff4757, #ff6b81);
-        width: 0%; /* เริ่มจาก 0 เพื่อเล่นแอนิเมชั่น */
-        transition: width 2s cubic-bezier(0.1, 0.5, 0.5, 1);
+        width: 0%;
+        background: linear-gradient(90deg, #3498db, var(--prc-blue));
+        transition: width 1.5s ease-in-out;
         display: flex;
         align-items: center;
         justify-content: center;
         color: white;
-        font-weight: bold;
-        font-size: 14px;
-      }
-
-      /* Heatmap Pitch */
-      .pitch-grid {
-        display: grid;
-        grid-template-columns: repeat(2, 1fr);
-        gap: 12px;
-        background: #1e90ff; /* สีสนามจำลอง */
-        padding: 15px;
-        border-radius: 15px;
-        border: 4px solid white;
-      }
-
-      .zone {
-        background: rgba(255, 71, 87, 0.8);
-        height: 100px;
-        border: 2px dashed rgba(255, 255, 255, 0.5);
-        border-radius: 10px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: white;
-        cursor: pointer;
-        transition: 0.4s;
+        font-size: 12px;
         font-weight: 600;
       }
 
-      .zone.cleaned {
-        background: rgba(46, 213, 115, 0.8);
-        border: 2px solid white;
-        transform: scale(0.98);
+      /* Pitch Map */
+      .pitch-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 15px;
+        background: #27ae60; /* สีเขียวสนามหญ้า */
+        padding: 20px;
+        border-radius: 15px;
+        border: 3px solid rgba(255,255,255,0.8);
+        position: relative;
       }
 
-      h3 {
-        margin-top: 0;
-        color: var(--prc-blue);
+      /* เส้นกลางสนาม */
+      .pitch-grid::after {
+        content: "";
+        position: absolute;
+        top: 50%; left: 0; right: 0;
+        height: 2px; background: rgba(255,255,255,0.5);
       }
-      .status-tag {
+
+      .zone {
+        background: rgba(231, 76, 60, 0.85); /* สีแดงขยะเยอะ */
+        height: 90px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: 600;
+        font-size: 14px;
+        cursor: pointer;
+        transition: all 0.3s;
+        text-align: center;
+        border: 2px solid transparent;
+      }
+
+      .zone.cleaned {
+        background: rgba(255, 255, 255, 0.2);
+        border: 2px solid white;
+        color: white;
+      }
+
+      .status-badge {
+        display: inline-block;
+        padding: 4px 12px;
+        border-radius: 20px;
         font-size: 12px;
-        color: #666;
+        background: #f1f2f6;
+        margin-top: 5px;
       }
+
+      h3 { margin: 0 0 10px; font-size: 18px; display: flex; align-items: center; gap: 10px; }
     </style>
   </head>
   <body>
+
     <div id="loader">
       <div class="spinner"></div>
-      <h2 style="letter-spacing: 2px">SMART PITCH</h2>
-      <p>กำลังเชื่อมต่อระบบ AI และ Firebase...</p>
+      <h2 style="letter-spacing: 2px; margin: 0">SMART PITCH</h2>
+      <p style="opacity: 0.7; font-weight: 300">ระบบจัดการความสะอาดอัจฉริยะ</p>
     </div>
 
     <div class="header">
-      <img
-        src="https://upload.wikimedia.org/wikipedia/th/f/f6/The_Prince_Royal%27s_College_Logo.png"
-        class="logo"
-        alt="PRC Logo"
-      />
-      <h1 style="margin: 0; font-size: 24px">Smart Pitch Cleaner</h1>
-      <p style="margin: 5px 0 0; opacity: 0.8">The Prince Royal's College</p>
+      <img src="prc_logo_2014-Color2.png" class="logo" alt="PRC Logo" onerror="this.src='https://upload.wikimedia.org/wikipedia/th/f/f6/The_Prince_Royal%27s_College_Logo.png'"/>
+      <h1 style="margin: 0; font-size: 26px; font-weight: 600">Smart Pitch Cleaner</h1>
+      <p style="margin: 5px 0 0; opacity: 0.9; font-weight: 300">Project Innovation @ PRC</p>
     </div>
 
     <div class="container">
       <div class="card">
-        <h3><span id="trash-icon">🗑️</span> ปริมาณขยะในเครื่อง</h3>
+        <h3>🗑️ Trash Capacity</h3>
         <div class="progress-container">
           <div id="trash-bar" class="progress-bar">0%</div>
         </div>
-        <p id="alert-text" class="status-tag">สถานะ: ตรวจสอบระดับขยะแล้ว</p>
+        <div id="alert-text" class="status-badge">สถานะ: กำลังตรวจสอบระบบ...</div>
       </div>
 
       <div class="card">
-        <h3><span id="map-icon">📍</span> แผนที่ความสะอาด (Heatmap)</h3>
+        <h3>📍 Cleaning Heatmap</h3>
         <div class="pitch-grid">
-          <div class="zone" onclick="toggleZone(this)">โซนประตู (เหนือ)</div>
-          <div class="zone" onclick="toggleZone(this)">ขอบสนาม</div>
-          <div class="zone" onclick="toggleZone(this)">กลางสนาม</div>
-          <div class="zone" onclick="toggleZone(this)">โซนประตู (ใต้)</div>
+          <div class="zone" onclick="toggleZone(this)">Zone A<br>(Goal North)</div>
+          <div class="zone" onclick="toggleZone(this)">Zone B<br>(Sideline)</div>
+          <div class="zone" onclick="toggleZone(this)">Zone C<br>(Center)</div>
+          <div class="zone" onclick="toggleZone(this)">Zone D<br>(Goal South)</div>
         </div>
-        <p style="font-size: 12px; color: #888; margin-top: 15px">
-          * กดที่โซนเพื่อยืนยันการทำความสะอาดเสร็จสิ้น
+        <p style="font-size: 11px; color: #95a5a6; margin-top: 15px; text-align: center;">
+          * พื้นที่สีแดงคือจุดที่มีขยะหนาแน่น กดเพื่อระบุว่าทำความสะอาดแล้ว
         </p>
       </div>
     </div>
 
     <script>
-      /* --- JAVASCRIPT LOGIC --- */
-
-      // 1. จัดการ Loading Screen และแอนิเมชั่นตอนเริ่ม
+      // 1. จัดการการโหลด
       window.addEventListener("load", () => {
-        const loader = document.getElementById("loader");
-        const trashBar = document.getElementById("trash-bar");
-
         setTimeout(() => {
-          loader.style.opacity = "0";
+          document.getElementById("loader").style.opacity = "0";
           setTimeout(() => {
-            loader.style.display = "none";
-            // เริ่มเล่นแอนิเมชั่นแถบขยะหลังจากเข้าเว็บแล้ว
-            updateTrashLevel(85); // สมมติขยะ 85% เพื่อความว้าว
-          }, 800);
-        }, 2000);
+            document.getElementById("loader").style.display = "none";
+            // สุ่มค่าขยะโชว์ความสมจริง
+            updateTrashLevel(Math.floor(Math.random() * 40) + 60); 
+          }, 600);
+        }, 1500);
       });
 
       // 2. ฟังก์ชันอัปเดตระดับขยะ
@@ -232,31 +212,26 @@
         const bar = document.getElementById("trash-bar");
         const alert = document.getElementById("alert-text");
         bar.style.width = percent + "%";
-        bar.innerText = percent + "%";
+        bar.innerText = percent + "% Full";
 
         if (percent > 80) {
-          alert.innerText = "🚨 คำเตือน: ขยะใกล้เต็ม กรุณานำไปเททิ้ง";
-          alert.style.color = "red";
-          alert.style.fontWeight = "bold";
+          bar.style.background = "linear-gradient(90deg, #e74c3c, #c0392b)";
+          alert.innerHTML = "⚠️ <b>คำเตือน:</b> ถังขยะใกล้เต็มแล้ว";
+          alert.style.color = "#e74c3c";
         } else {
-          alert.innerText = "สถานะ: ปกติ";
-          alert.style.color = "#666";
+          alert.innerHTML = "✅ <b>ปกติ:</b> พร้อมสำหรับการทำงาน";
+          alert.style.color = "#27ae60";
         }
       }
 
-      // 3. ฟังก์ชันสลับสถานะโซนสนาม
+      // 3. ฟังก์ชันคลิกโซน
       function toggleZone(el) {
         el.classList.toggle("cleaned");
         if (el.classList.contains("cleaned")) {
-          el.innerText = "✓ CLEANED";
+          el.innerHTML = "✨<br>CLEANED";
         } else {
-          // เอากลับไปชื่อเดิม (ใช้ข้อมูลจาก InnerText หรือระบุตามเงื่อนไข)
-          if (el.innerText.includes("ประตู (เหนือ)"))
-            el.innerText = "โซนประตู (เหนือ)";
-          if (el.innerText.includes("ขอบสนาม")) el.innerText = "ขอบสนาม";
-          if (el.innerText.includes("กลางสนาม")) el.innerText = "กลางสนาม";
-          if (el.innerText.includes("ประตู (ใต้)"))
-            el.innerText = "โซนประตู (ใต้)";
+          // คืนค่าข้อความเดิม (กรณีต้องการกดซ้ำเพื่อ Reset)
+          if(el.innerHTML.includes("CLEANED")) location.reload(); 
         }
       }
     </script>
